@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.CarpinteriaSpringBoot.app.model.Cliente;
 import com.CarpinteriaSpringBoot.app.repository.ClienteRepository;
-import com.CarpinteriaSpringBoot.app.repository.VehiculoRepository;
+import com.CarpinteriaSpringBoot.app.repository.ProyectoRepository;
 
 import jakarta.validation.Valid;
 @Controller
@@ -26,7 +26,7 @@ public class ClienteWebController {
     private ClienteRepository clienteRepository;
 
     @Autowired
-    private VehiculoRepository vehiculoRepository;
+    private ProyectoRepository proyectoRepository;
 
     @GetMapping
     public String listarClientes(@RequestParam(value = "accion", required = false) String accion, Model model) {
@@ -38,14 +38,8 @@ public class ClienteWebController {
     @GetMapping("/nuevo")
     public String nuevoCliente(Model model) {
         model.addAttribute("cliente", new Cliente());
-
-        // Obtener la lista de placas de vehículos y agregarla al modelo
-        List<String> placas = vehiculoRepository.findAll()
-                .stream()
-                .map(vehiculo -> vehiculo.getPlaca())
-                .collect(Collectors.toList());
-        model.addAttribute("placas", placas);
-
+        // Obtener la lista de proyectos y agregarla al modelo
+        model.addAttribute("proyectos", proyectoRepository.findAll());
         return "cliente_form";
     }
 
@@ -59,26 +53,16 @@ public class ClienteWebController {
     public String editarCliente(@PathVariable String id, Model model) {
         Cliente cliente = clienteRepository.findById(id).orElse(null);
         model.addAttribute("cliente", cliente);
-
-        // Obtener la lista de placas de vehículos y agregarla al modelo
-        List<String> placas = vehiculoRepository.findAll()
-                .stream()
-                .map(vehiculo -> vehiculo.getPlaca())
-                .collect(Collectors.toList());
-        model.addAttribute("placas", placas);
-
+        // Obtener la lista de proyectos y agregarla al modelo
+        model.addAttribute("proyectos", proyectoRepository.findAll());
         return "cliente_form";
     }
 
     @PostMapping("/actualizar/{id}")
     public String actualizarCliente(@PathVariable String id, @Valid @ModelAttribute Cliente cliente, BindingResult result, Model model) {
         if (result.hasErrors()) {
-            // Si hay errores, volver a cargar la lista de placas
-            List<String> placas = vehiculoRepository.findAll()
-                    .stream()
-                    .map(vehiculo -> vehiculo.getPlaca())
-                    .collect(Collectors.toList());
-            model.addAttribute("placas", placas);
+            // Si hay errores, volver a cargar la lista de proyectos
+            model.addAttribute("proyectos", proyectoRepository.findAll());
             return "cliente_form";
         }
         cliente.setId(id);
@@ -97,28 +81,21 @@ public class ClienteWebController {
     public String guardarNota(@PathVariable String id, @RequestParam("nota") String nota) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
-        
-        // Establecer la nota y guardar el cliente
         cliente.setNota(nota);
         clienteRepository.save(cliente);
-
         return "redirect:/indexmecanico";
     }
 
     // Funcionalidad para buscar cliente por nombre
     @GetMapping("/buscar")
     public String buscarCliente(@RequestParam("nombre") String nombre, Model model) {
-        // Buscar el cliente por nombre
         Cliente cliente = clienteRepository.findByNombre(nombre); // Asumimos que tienes un método findByNombre
-        
         if (cliente != null) {
-            model.addAttribute("cliente", cliente); // Pasamos el cliente encontrado a la vista
-            return "cliente_detalle"; // Redirige a la vista cliente_detalle.html
+            model.addAttribute("cliente", cliente);
+            return "cliente_detalle";
         } else {
             model.addAttribute("mensaje", "Cliente no encontrado");
-            return "clientes"; // Redirige a la lista de clientes si no se encuentra
+            return "clientes";
         }
     }
-
-    
 }

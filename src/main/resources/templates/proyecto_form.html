@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Cliente | Carpintería Morguelo's Wood</title>
+    <title>Formulario de Proyecto | Carpintería Morguelo's Wood</title>
     <link rel="icon" href="/img/leon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -165,32 +165,31 @@
             background: linear-gradient(to right, var(--color-wood-dark), var(--color-accent));
         }
 
-        form label {
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
             color: var(--color-wood-dark);
         }
 
-        form input[type="text"],
-        form input[type="email"],
-        form select {
+        .form-control {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
+            padding: 12px 15px;
             border: 1px solid var(--color-wood-light);
-            border-radius: 4px;
-            font-size: 1rem;
+            border-radius: var(--border-radius);
             font-family: 'Raleway', sans-serif;
+            font-size: 1rem;
             transition: var(--transition-smooth);
         }
 
-        form input[type="text"]:focus,
-        form input[type="email"]:focus,
-        form select:focus {
+        .form-control:focus {
             outline: none;
             border-color: var(--color-accent);
-            box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
         }
 
         .button-container {
@@ -271,20 +270,6 @@
         }
 
         /* Responsive design */
-        @media (max-width: 1024px) {
-            .header-title {
-                font-size: 1.5rem;
-            }
-            
-            .page-title {
-                font-size: 1.8rem;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-        }
-
         @media (max-width: 768px) {
             header {
                 padding: 15px 20px;
@@ -303,6 +288,10 @@
             
             .page-title {
                 font-size: 1.6rem;
+            }
+            
+            .form-container {
+                padding: 20px;
             }
             
             .button-container {
@@ -337,42 +326,50 @@
     </header>
 
     <div class="page-title-container">
-        <h2 class="page-title" th:text="${cliente != null ? 'Editar Cliente' : 'Nuevo Cliente'}"></h2>
+        <h2 class="page-title">Formulario de Proyecto</h2>
     </div>
 
     <div class="main-content">
         <div class="form-container">
-            <form th:action="@{${cliente.id != null} ? '/clientes/actualizar/' + ${cliente.id} : '/clientes/guardar'}" 
-                  th:object="${cliente}" method="post">
-                <label for="cedula">Cédula:</label>
-                <input type="text" id="cedula" th:field="*{cedula}" required>
-
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" th:field="*{nombre}" required>
-
-                <label for="telefono">Teléfono:</label>
-                <input type="text" id="telefono" th:field="*{telefono}" required>
-
-                <label for="email">Email:</label>
-                <input type="email" id="email" th:field="*{email}" required>
-
-                <label for="direccion">Dirección:</label>
-                <input type="text" id="direccion" th:field="*{direccion}" required>
-
-                <label for="idProyecto">ID de Proyecto:</label>
-                <select th:field="*{vehiculos[0].placa}" id="idProyecto" required>
-                    <option value="" disabled selected>Seleccione un ID de proyecto</option>
-                    <option th:each="placa : ${placas}" th:value="${placa}" th:text="${placa}"></option>
-                </select>
-
+            <form th:action="@{/proyectos/guardar}" th:object="${proyecto}" method="post">
+                <div class="form-group">
+                    <label class="form-label">Nombre del Proyecto:</label>
+                    <input type="text" th:field="*{nombreProyecto}" class="form-control" required />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Descripción:</label>
+                    <textarea th:field="*{descripcion}" class="form-control" rows="4" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fecha de Inicio:</label>
+                    <input type="date" th:field="*{fechaInicio}" class="form-control" required />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fecha de Entrega Estimada:</label>
+                    <input type="date" th:field="*{fechaEntregaEstimada}" class="form-control" required />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Estado:</label>
+                    <select th:field="*{estado}" class="form-control" required>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En Progreso">En Progreso</option>
+                        <option value="Completado">Completado</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+                
                 <div class="button-container">
                     <button type="submit" class="wood-btn primary-btn">
-                        <span class="btn-icon">✓</span>
-                        <span>Guardar Cliente</span>
+                        <span class="btn-icon">💾</span>
+                        <span>Guardar Proyecto</span>
                     </button>
-                    <a th:href="@{/clientes}" class="wood-btn secondary-btn">
+                    <a href="/proyectos" class="wood-btn secondary-btn">
                         <span class="btn-icon">←</span>
-                        <span>Volver a la lista</span>
+                        <span>Cancelar</span>
                     </a>
                 </div>
             </form>
